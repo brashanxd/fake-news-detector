@@ -1,0 +1,11 @@
+streamlit
+transformers
+torch
+requests
+beautifulsoup4
+matplotlib
+seaborn
+altair
+scikit-learn
+textblob
+langdetect
