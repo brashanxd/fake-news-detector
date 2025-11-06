@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Análisis Semántico de Noticias</title>
+
+  <!-- React y Babel desde CDN -->
+  <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f7fa;
+      margin: 0;
+      padding: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+    .container {
+      max-width: 700px;
+      width: 100%;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      padding: 30px;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    textarea {
+      width: 100%;
+      height: 150px;
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .resultado {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f0f8ff;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    function App() {
+      const [texto, setTexto] = React.useState("");
+      const [resultado, setResultado] = React.useState(null);
+
+      // 🔹 NUEVA FUNCIÓN que llama al backend FastAPI
+      const analizar = async () => {
+        if (texto.trim() === "") {
+          alert("Por favor, ingresa un texto para analizar.");
+          return;
+        }
+
+        try {
+          const response = await fetch("http://127.0.0.1:8000/analyze_text", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text: texto }),
+          });
+
+          if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.detail || "Error al analizar el texto.");
+          }
+
+          const data = await response.json();
+          setResultado(data);
+
+        } catch (error) {
+          console.error("Error:", error);
+          alert("No se pudo analizar la noticia. Verifica que el servidor FastAPI esté corriendo.");
+        }
+      };
+
+      return (
+        <div className="container">
+          <h1>Análisis Semántico de Noticias</h1>
+          <textarea
+            value={texto}
+            onChange={(e) => setTexto(e.target.value)}
+            placeholder="Pega aquí la noticia o texto a analizar..."
+          ></textarea>
+          <button onClick={analizar}>Analizar Noticia</button>
+
+          {resultado && (
+            <div className="resultado">
+              <p><strong>Idioma detectado:</strong> {resultado.language}</p>
+              <p><strong>Clasificación:</strong> {resultado.label}</p>
+              <p><strong>Confianza:</strong> {resultado.confidence}</p>
+              <p><strong>Polaridad:</strong> {resultado.polaridad}</p>
+              <p><strong>Palabras clave:</strong> {resultado.keywords.map(k => k.word || k).join(", ")}</p>
+              <p><strong>Explicación:</strong> {resultado.explanation}</p>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    ReactDOM.render(<App />, document.getElementById("root"));
+  </script>
+</body>
+</html>

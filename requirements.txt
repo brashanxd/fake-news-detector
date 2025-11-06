@@ -1,11 +1,18 @@
-streamlit
+# Core IA/NLP
 transformers
 torch
-requests
-beautifulsoup4
-matplotlib
-seaborn
-altair
-scikit-learn
 textblob
 langdetect
+
+# Web Scraping
+requests
+beautifulsoup4
+
+# Visualizaciones (para lógica interna)
+pandas
+scikit-learn
+
+# API Backend
+fastapi
+uvicorn
+pydantic
