@@ -1,8 +1,11 @@
+
+
 # ===============================================
 # API Backend para el Analizador de Noticias Falsas
 # ===============================================
 
 from fastapi import FastAPI, HTTPException
+import os
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from analyzer import NewsAnalyzer
@@ -53,7 +56,8 @@ class AnalysisResult(BaseModel):
 analyzer = None
 try:
     print("🧠 Cargando modelo de NewsAnalyzer...")
-    analyzer = NewsAnalyzer()
+    # Pasar la clave desde la variable de entorno si está presente
+    analyzer = NewsAnalyzer(os.getenv("NEWSAPI_KEY"))
     print("✅ Modelo cargado correctamente.")
 except Exception as e:
     print(f"❌ ERROR al inicializar NewsAnalyzer: {e}", file=sys.stderr)
